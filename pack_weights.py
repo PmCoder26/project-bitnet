@@ -1,0 +1,1 @@
+#convert trained weights ->1 bit packed binary
