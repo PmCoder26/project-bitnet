@@ -1,172 +1,181 @@
 {
-    "type": "bitnet",
-    "avg_latency": 5.27671500305204,
-    "avg_memory": null,
-    "avg_throughput": 24263.158347168548,
-    "avg_power_watts": null,
-    "avg_energy_joules": null,
-    "avg_energy_per_token": null,
-    "latency_std": 0.29726734807719724,
+    "model_type": "bitnet",
+    "platform": "Darwin",
+    "device": "mps",
+    "rapl_enabled": false,
+    "mac_energy_enabled": true,
+    "input_shape": [
+        1,
+        129
+    ],
+    "avg_latency_ms": 18.00348900034901,
+    "avg_memory_mb": 2.765869140625,
+    "avg_throughput_tokens_per_sec": 7089.981753429667,
+    "avg_power_watts": 0.30057894736842106,
+    "avg_energy_joules": 0.00539664772788513,
+    "avg_energy_per_token": 4.183447851073745e-05,
+    "latency_std_ms": 1.355535278121617,
+    "num_runs": 20,
     "runs": [
         {
-            "latency": 5.138459004228935,
-            "memory": null,
-            "throughput": 25104.802800573758,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 16.13562500278931,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 7994.732151850344,
+            "power_watts": 0.275,
+            "energy_joules": 0.004437296875767061,
+            "energy_per_token": 3.4397650199744654e-05
         },
         {
-            "latency": 5.017707997467369,
-            "memory": null,
-            "throughput": 25708.949198540704,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 18.95295799477026,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 6806.325431396795,
+            "power_watts": 0.678,
+            "energy_joules": 0.012850105520454236,
+            "energy_per_token": 9.961322108879252e-05
         },
         {
-            "latency": 5.709417018806562,
-            "memory": null,
-            "throughput": 22594.25079217017,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 15.291749994503334,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 8435.921333161308,
+            "power_watts": 1.687,
+            "energy_joules": 0.025797182240727124,
+            "energy_per_token": 0.00019997815690486143
         },
         {
-            "latency": 5.264833976980299,
-            "memory": null,
-            "throughput": 24502.197137465922,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 17.259832995478064,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 7474.000474616235,
+            "power_watts": 0.806,
+            "energy_joules": 0.01391142539435532,
+            "energy_per_token": 0.00010784050693298699
         },
         {
-            "latency": 5.159667023690417,
-            "memory": null,
-            "throughput": 25001.613361424555,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 18.11945800727699,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 7119.418249055357,
+            "power_watts": 0.247,
+            "energy_joules": 0.0044755061277974165,
+            "energy_per_token": 3.469384595191796e-05
         },
         {
-            "latency": 5.616292008198798,
-            "memory": null,
-            "throughput": 22968.891185088436,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 19.487249999656342,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 6619.712889313521,
+            "power_watts": 0.097,
+            "energy_joules": 0.0018902632499666653,
+            "energy_per_token": 1.4653203488113685e-05
         },
         {
-            "latency": 5.2342499839141965,
-            "memory": null,
-            "throughput": 24645.36474116454,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 20.39179200073704,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 6326.07472630838,
+            "power_watts": 0.133,
+            "energy_joules": 0.0027121083360980265,
+            "energy_per_token": 2.102409562866687e-05
         },
         {
-            "latency": 4.960165999364108,
-            "memory": null,
-            "throughput": 26007.194117402072,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 20.462500004214235,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 6304.215026190962,
+            "power_watts": 0.097,
+            "energy_joules": 0.001984862500408781,
+            "energy_per_token": 1.5386531010920783e-05
         },
         {
-            "latency": 5.606916005490348,
-            "memory": null,
-            "throughput": 23007.300247352006,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 17.955707997316495,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 7184.344945867867,
+            "power_watts": 0.104,
+            "energy_joules": 0.0018673936317209153,
+            "energy_per_token": 1.447591962574353e-05
         },
         {
-            "latency": 5.19825000083074,
-            "memory": null,
-            "throughput": 24816.043856948843,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 19.081042002653703,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 6760.63707537876,
+            "power_watts": 0.419,
+            "energy_joules": 0.007994956599111902,
+            "energy_per_token": 6.19764077450535e-05
         },
         {
-            "latency": 5.0663750153034925,
-            "memory": null,
-            "throughput": 25461.991978553226,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 19.911291004973464,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 6478.736108461187,
+            "power_watts": 0.144,
+            "energy_joules": 0.0028672259047161784,
+            "energy_per_token": 2.2226557400900606e-05
         },
         {
-            "latency": 5.722208006773144,
-            "memory": null,
-            "throughput": 22543.745324760646,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 17.483832998550497,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 7378.244805397923,
+            "power_watts": 0.104,
+            "energy_joules": 0.0018183186318492515,
+            "energy_per_token": 1.4095493270149236e-05
         },
         {
-            "latency": 5.1698329916689545,
-            "memory": null,
-            "throughput": 24952.450148366494,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 16.602125004283153,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 7770.089670251219,
+            "power_watts": 0.124,
+            "energy_joules": 0.002058663500531111,
+            "energy_per_token": 1.5958631787062877e-05
         },
         {
-            "latency": 5.000208999263123,
-            "memory": null,
-            "throughput": 25798.921608878878,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 18.678249994991347,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 6906.428601961742,
+            "power_watts": 0.173,
+            "energy_joules": 0.003231337249133503,
+            "energy_per_token": 2.5049125962275214e-05
         },
         {
-            "latency": 5.697250016964972,
-            "memory": null,
-            "throughput": 22642.502894531674,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 18.303415999980643,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 7047.864726460702,
+            "power_watts": 0.192,
+            "energy_joules": 0.0035142558719962838,
+            "energy_per_token": 2.724229358136654e-05
         },
         {
-            "latency": 5.407999997260049,
-            "memory": null,
-            "throughput": 23853.550307943337,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 17.060708996723406,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 7561.233242110577,
+            "power_watts": 0.571,
+            "energy_joules": 0.009741664837129065,
+            "energy_per_token": 7.551678168317105e-05
         },
         {
-            "latency": 5.031792010413483,
-            "memory": null,
-            "throughput": 25636.98971122607,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 17.120292002800852,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 7534.918211610866,
+            "power_watts": 0.632,
+            "energy_joules": 0.010820024545770138,
+            "energy_per_token": 8.387615926953596e-05
         },
         {
-            "latency": 6.014791986672208,
-            "memory": null,
-            "throughput": 21447.125733665078,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 18.574500005342998,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 6945.005247134128,
+            "power_watts": 0.101,
+            "energy_joules": 0.001876024500539643,
+            "energy_per_token": 1.4542825585578628e-05
         },
         {
-            "latency": 5.151999997906387,
-            "memory": null,
-            "throughput": 25038.819885951398,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 18.586709004011936,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 6940.443301294241,
+            "power_watts": 0.389,
+            "energy_joules": 0.007230229802560643,
+            "energy_per_token": 5.604829304310576e-05
         },
         {
-            "latency": 5.1039590034633875,
-            "memory": null,
-            "throughput": 25274.497681596702,
-            "power_watts": null,
-            "energy_joules": null,
-            "energy_per_token": null
+            "latency_ms": 17.069749999791384,
+            "memory_mb": 2.765869140625,
+            "throughput_tokens_per_sec": 7557.228430502882,
+            "power_watts": 0.425,
+            "energy_joules": 0.007254643749911338,
+            "energy_per_token": 5.62375484489251e-05
         }
     ]
 }
