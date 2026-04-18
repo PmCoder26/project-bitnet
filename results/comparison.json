@@ -1,0 +1,9 @@
+{
+    "latency_speedup": 0.7763430625176847,
+    "throughput_gain": 0.7763290250810102,
+    "memory_reduction": 73.78275222879337,
+    "power_efficiency": 0.5133952022412888,
+    "energy_saving": 0.3920560737087718,
+    "energy_per_token_gain": 0.39205607370877177,
+    "latency_stability_gain": 1.270188882555759
+}

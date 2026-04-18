@@ -6,7 +6,6 @@ import numpy as np
 import platform
 import subprocess
 import re
-import threading
 import psutil
 
 from bitnet.model import BitNetDecoder
@@ -18,17 +17,13 @@ from data.dataset import UniProtDataset
 SYSTEM = platform.system()
 
 # --------------------------------------------------
-# DEVICE SETUP
+# FORCE CPU ONLY
 # --------------------------------------------------
-if torch.cuda.is_available():
-    DEVICE = "cuda"
-elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-    DEVICE = "mps"
-else:
-    DEVICE = "cpu"
+DEVICE = "cpu"
+torch.set_num_threads(os.cpu_count())  # use all CPU cores
 
 print(f"Platform: {SYSTEM}")
-print(f"Using device: {DEVICE}")
+print(f"Using device: {DEVICE} (CPU ONLY)")
 
 # --------------------------------------------------
 # ENERGY MEASUREMENT FLAGS
@@ -83,35 +78,15 @@ class MacEnergyMonitor:
 
             output = result.stdout + "\n" + result.stderr
 
-            cpu_match = re.search(
-                r"CPU\s*[Pp]ower:\s*([0-9.]+)\s*mW",
-                output
-            )
-
-            gpu_match = re.search(
-                r"GPU\s*[Pp]ower:\s*([0-9.]+)\s*mW",
-                output
-            )
-
-            package_match = re.search(
-                r"Package\s*[Pp]ower:\s*([0-9.]+)\s*mW",
-                output
-            )
-
-            ane_match = re.search(
-                r"ANE\s*[Pp]ower:\s*([0-9.]+)\s*mW",
-                output
-            )
-
-            combined_match = re.search(
-                r"Combined\s*[Pp]ower.*?:\s*([0-9.]+)\s*mW",
-                output
-            )
+            cpu_match = re.search(r"CPU\s*[Pp]ower:\s*([0-9.]+)\s*mW", output)
+            gpu_match = re.search(r"GPU\s*[Pp]ower:\s*([0-9.]+)\s*mW", output)
+            package_match = re.search(r"Package\s*[Pp]ower:\s*([0-9.]+)\s*mW", output)
+            ane_match = re.search(r"ANE\s*[Pp]ower:\s*([0-9.]+)\s*mW", output)
 
             cpu_power = float(cpu_match.group(1)) if cpu_match else 0.0
             gpu_power = float(gpu_match.group(1)) if gpu_match else 0.0
-            package_power = float(package_match.group(1)) if package_match else 0.0
             ane_power = float(ane_match.group(1)) if ane_match else 0.0
+            package_power = float(package_match.group(1)) if package_match else 0.0
 
             total_mw = cpu_power + gpu_power + ane_power
 
@@ -119,17 +94,13 @@ class MacEnergyMonitor:
                 self.samples.append(total_mw / 1000.0)
             elif package_power > 0:
                 self.samples.append(package_power / 1000.0)
-            elif combined_match:
-                self.samples.append(float(combined_match.group(1)) / 1000.0)
 
         except Exception as e:
             print(f"⚠️ powermetrics parse error: {e}")
 
     def average_power(self):
-        if len(self.samples) == 0:
-            return None
-        return float(sum(self.samples) / len(self.samples))
-    
+        return None if len(self.samples) == 0 else float(sum(self.samples) / len(self.samples))
+
 
 # --------------------------------------------------
 # LOAD DATASET
@@ -143,7 +114,7 @@ dataset = UniProtDataset(
 tokenizer = dataset.tokenizer
 
 # --------------------------------------------------
-# LOAD MODEL
+# LOAD MODEL (CPU ONLY)
 # --------------------------------------------------
 model = BitNetDecoder(
     vocab_size=tokenizer.vocab_size,
@@ -156,17 +127,17 @@ model = BitNetDecoder(
 checkpoint_path = "checkpoints/checkpoint_step382500.pth"
 
 model.load_state_dict(
-    torch.load(checkpoint_path, map_location=DEVICE)
+    torch.load(checkpoint_path, map_location="cpu")
 )
 
-model.to(DEVICE)
+model.to("cpu")
 model.eval()
 
-print("✅ Model loaded successfully")
+print("✅ Model loaded on CPU")
 
 
 # --------------------------------------------------
-# SINGLE BENCHMARK MEASUREMENT
+# MEASURE FUNCTION (CPU ONLY)
 # --------------------------------------------------
 def measure(input_ids):
     meter = None
@@ -176,39 +147,24 @@ def measure(input_ids):
         try:
             meter = pyRAPL.Measurement("bitnet")
             meter.begin()
-        except Exception:
+        except:
             meter = None
 
     elif USE_MAC_ENERGY:
         mac_monitor = MacEnergyMonitor()
         mac_monitor.begin()
 
-    # Device synchronization
-    if DEVICE == "cuda":
-        torch.cuda.empty_cache()
-        torch.cuda.reset_peak_memory_stats()
-        torch.cuda.synchronize()
-
-    elif DEVICE == "mps":
-        torch.mps.synchronize()
-
     start = time.perf_counter()
 
     with torch.no_grad():
         _ = model(input_ids)
-
-    if DEVICE == "cuda":
-        torch.cuda.synchronize()
-
-    elif DEVICE == "mps":
-        torch.mps.synchronize()
 
     end = time.perf_counter()
 
     if meter is not None:
         try:
             meter.end()
-        except Exception:
+        except:
             meter = None
 
     if mac_monitor is not None:
@@ -217,48 +173,27 @@ def measure(input_ids):
     latency_ms = (end - start) * 1000
     tokens = input_ids.numel()
 
-    energy_joules = None
     power_watts = None
+    energy_joules = None
     energy_per_token = None
 
-    # Linux energy calculation
     if meter is not None:
         try:
             if meter.result and meter.result.pkg:
-                energy_microjoules = meter.result.pkg[0]
-                energy_joules = energy_microjoules / 1_000_000
-
-                if latency_ms > 0:
-                    power_watts = energy_joules / (latency_ms / 1000)
-
-                if tokens > 0:
-                    energy_per_token = energy_joules / tokens
-        except Exception:
+                energy_joules = meter.result.pkg[0] / 1_000_000
+                power_watts = energy_joules / (latency_ms / 1000)
+                energy_per_token = energy_joules / tokens if tokens else None
+        except:
             pass
 
-    # macOS energy calculation
     elif mac_monitor is not None:
         power_watts = mac_monitor.average_power()
-
         if power_watts is not None:
             energy_joules = power_watts * (latency_ms / 1000)
+            energy_per_token = energy_joules / tokens if tokens else None
 
-            if tokens > 0:
-                energy_per_token = energy_joules / tokens
-
-    # Memory measurement
-    if DEVICE == "cuda":
-        memory_mb = torch.cuda.max_memory_allocated() / (1024 ** 2)
-
-    elif DEVICE == "mps":
-        try:
-            memory_mb = torch.mps.current_allocated_memory() / (1024 ** 2)
-        except Exception:
-            memory_mb = None
-
-    else:
-        process = psutil.Process(os.getpid())
-        memory_mb = process.memory_info().rss / (1024 ** 2)
+    process = psutil.Process(os.getpid())
+    memory_mb = process.memory_info().rss / (1024 ** 2)
 
     throughput = tokens / (latency_ms / 1000)
 
@@ -277,36 +212,28 @@ def measure(input_ids):
 # --------------------------------------------------
 def clean_avg(values):
     values = [v for v in values if v is not None]
-
     if len(values) == 0:
         return None
-
     if len(values) < 3:
         return float(sum(values) / len(values))
 
     threshold = np.percentile(values, 95)
     filtered = [v for v in values if v <= threshold]
-
-    if len(filtered) == 0:
-        filtered = values
-
-    return float(sum(filtered) / len(filtered))
+    return float(sum(filtered) / len(filtered)) if filtered else None
 
 
 # --------------------------------------------------
-# MAIN BENCHMARK
+# RUN BENCHMARK
 # --------------------------------------------------
 def run():
     sample = dataset[0]
-    input_ids = sample["input_ids"].unsqueeze(0).to(DEVICE)
+    input_ids = sample["input_ids"].unsqueeze(0).to("cpu")
 
-    print(f"Input shape: {tuple(input_ids.shape)}")
     print("Running warmup...")
-
     for _ in range(5):
         measure(input_ids)
 
-    print("Starting benchmark...")
+    print("Starting CPU benchmark...")
 
     results = []
 
@@ -314,79 +241,33 @@ def run():
         result = measure(input_ids)
         results.append(result)
 
-        line = (
-            f"[BitNet] Run {i + 1:02d} | "
+        print(
+            f"[CPU] Run {i+1:02d} | "
             f"Latency: {result['latency_ms']:.2f} ms | "
             f"Throughput: {result['throughput_tokens_per_sec']:.2f} tok/s"
         )
 
-        if result["memory_mb"] is not None:
-            line += f" | Memory: {result['memory_mb']:.2f} MB"
-
-        if result["power_watts"] is not None:
-            line += f" | Power: {result['power_watts']:.2f} W"
-
-        if result["energy_per_token"] is not None:
-            line += f" | Energy/token: {result['energy_per_token']:.8f} J"
-
-        print(line)
-
     avg_latency = clean_avg([r["latency_ms"] for r in results])
     avg_memory = clean_avg([r["memory_mb"] for r in results])
     avg_throughput = clean_avg([r["throughput_tokens_per_sec"] for r in results])
-    avg_power = clean_avg([r["power_watts"] for r in results])
-    avg_energy = clean_avg([r["energy_joules"] for r in results])
-    avg_energy_per_token = clean_avg([r["energy_per_token"] for r in results])
-
-    latency_std = float(np.std([r["latency_ms"] for r in results]))
 
     output = {
-        "model_type": "bitnet",
+        "model_type": "bitnet_cpu",
         "platform": SYSTEM,
-        "device": DEVICE,
-        "rapl_enabled": USE_RAPL,
-        "mac_energy_enabled": USE_MAC_ENERGY,
-        "input_shape": list(input_ids.shape),
+        "device": "cpu",
         "avg_latency_ms": avg_latency,
         "avg_memory_mb": avg_memory,
         "avg_throughput_tokens_per_sec": avg_throughput,
-        "avg_power_watts": avg_power,
-        "avg_energy_joules": avg_energy,
-        "avg_energy_per_token": avg_energy_per_token,
-        "latency_std_ms": latency_std,
-        "num_runs": len(results),
         "runs": results
     }
 
     os.makedirs("results", exist_ok=True)
 
-    with open("results/bitnet.json", "w") as f:
+    with open("results/bitnet_cpu.json", "w") as f:
         json.dump(output, f, indent=4)
 
-    print("\n✅ Benchmark complete")
-    print("Results saved to: results/bitnet.json")
-
-    print("\n===== SUMMARY =====")
-    print(f"Average Latency: {avg_latency:.2f} ms")
-    print(f"Average Throughput: {avg_throughput:.2f} tok/s")
-
-    if avg_memory is not None:
-        print(f"Average Memory: {avg_memory:.2f} MB")
-
-    if avg_power is not None:
-        print(f"Average Power: {avg_power:.2f} W")
-
-    if avg_energy is not None:
-        print(f"Average Energy: {avg_energy:.6f} J")
-
-    if avg_energy_per_token is not None:
-        print(f"Average Energy per Token: {avg_energy_per_token:.8f} J")
-
-    print(f"Latency Std Dev: {latency_std:.2f} ms")
+    print("\n✅ CPU benchmark complete")
 
 
-# --------------------------------------------------
-# ENTRY POINT
-# --------------------------------------------------
 if __name__ == "__main__":
     run()

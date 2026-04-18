@@ -4,10 +4,10 @@ import os
 # --------------------------------------------------
 # LOAD RESULTS
 # --------------------------------------------------
-bitnet = json.load(open("../results/bitnet.json"))
-fp32 = json.load(open("../results/fp32.json"))
+bitnet = json.load(open("results/bitnet.json"))
+fp32 = json.load(open("results/fp32.json"))
 
-os.makedirs("../results", exist_ok=True)
+os.makedirs("results", exist_ok=True)
 
 # --------------------------------------------------
 # SAFE DIVISION
@@ -65,7 +65,7 @@ comparison = {
 # --------------------------------------------------
 # SAVE OUTPUT
 # --------------------------------------------------
-with open("../results/comparison.json", "w") as f:
+with open("results/comparison.json", "w") as f:
     json.dump(comparison, f, indent=4)
 
 # --------------------------------------------------

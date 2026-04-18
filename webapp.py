@@ -12,7 +12,7 @@ from data.dataset import UniProtDataset  # not DNADataset
 
 # ---------------- CONFIG ----------------
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-CHECKPOINT_PATH = "./checkpoints/checkpoint_step2500.pth"
+CHECKPOINT_PATH = "./checkpoints/checkpoint_step382500.pth"
 
 # ---------------- FUNCTION NAMES ----------------
 FUNCTION_NAMES = [
